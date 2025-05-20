@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мои чаты</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .chat-list { list-style: none; padding: 0; }
+        .chat-item { padding: 15px; border-bottom: 1px solid #eee; }
+        .chat-item:hover { background: #f5f5f5; }
+        .chat-link { text-decoration: none; color: #333; display: block; }
+        .create-btn {
+            display: inline-block; padding: 10px 15px;
+            background: #4CAF50; color: white; text-decoration: none; border-radius: 4px;
+        }
+        .logout-btn { color: #666; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Мои чаты</h1>
+        <div>
+            <a href="{{ url_for('create_chat') }}" class="create-btn">+ Создать чат</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </div>
+
+    <ul class="chat-list">
+        {% for chat in user.chats %}
+        <li class="chat-item">
+            <a href="{{ url_for('view_chat', chat_id=chat.id) }}" class="chat-link">
+                <strong>{{ chat.name }}</strong>
+                <span>({{ chat.members|map(attribute='username')|join(', ') }})</span>
+                <div>{{ chat.messages|length }} сообщений</div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
