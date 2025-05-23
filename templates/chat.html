@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat - {{ username }}</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <style>
+        #messages {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat: {{ username }}</h1>
+    <div id="messages"></div>
+    <input type="text" id="recipient" placeholder="Recipient">
+    <input type="text" id="message" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io();
+        const username = "{{ username }}";
+
+        socket.on('welcome', (data) => {
+            addMessage('System', data.message);
+        });
+
+        socket.on('new_message', (data) => {
+            addMessage(data.sender, `${data.message} (${data.time})`);
+        });
+
+        function addMessage(sender, message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p><b>${sender}:</b> ${message}</p>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function sendMessage() {
+            const recipient = document.getElementById('recipient').value;
+            const message = document.getElementById('message').value;
+            if (recipient && message) {
+                socket.emit('message', { recipient, message });
+                document.getElementById('message').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
