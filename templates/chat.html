@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-container">
+    <div class="contacts-sidebar">
+        <h3>Все пользователи</h3>
+        <div class="contact-list">
+            {% for contact in contacts %}
+            <div class="contact{% if contact.id == contact.id %} active{% endif %}">
+                <a href="{{ url_for('chat', contact_id=contact.id) }}">
+                    {{ contact.username }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="chat-main">
+        <h2>Чат с {{ contact.username }}</h2>
+        <div class="message-history">
+            {% for msg in messages %}
+            <div class="message {% if msg.sender.id == current_user.id %}sent{% else %}received{% endif %} {% if msg.error %}error{% endif %}">
+                <div class="message-header">
+                    <span class="sender">
+                        {% if msg.sender.id == current_user.id %}
+                            Вы
+                        {% else %}
+                            {{ msg.sender.username }}
+                        {% endif %}
+                    </span>
+                    <span class="time">{{ msg.timestamp.strftime('%H:%M') }}</span>
+                </div>
+                <div class="message-content">
+                    {% if msg.error %}
+                        <span class="error-icon">⚠️</span>
+                    {% endif %}
+                    {{ msg.content }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form method="POST" class="message-form">
+            <textarea name="content" placeholder="Введите сообщение..." required></textarea>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+</div>
+
+<meta http-equiv="refresh" content="5">
+{% endblock %}

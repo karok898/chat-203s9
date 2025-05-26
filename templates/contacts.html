@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="chat-container">
+    <div class="contacts-sidebar">
+        <h2>All Users</h2>
+        <div class="contact-list">
+            {% for contact in contacts %}
+            <div class="contact">
+                <a href="{{ url_for('chat', contact_id=contact.id) }}">
+                    {{ contact.username }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
