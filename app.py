@@ -5,9 +5,9 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from Cryptodome.Cipher import AES
-from Cryptodome.Util.Padding import pad, unpad
-from Cryptodome.Random import get_random_bytes
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
 import hashlib
 import hmac
 import base64
