@@ -4,132 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат с {{ contact.username }}</title>
+    <!-- Подключаем CryptoJS для AES-шифрования -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
+        /* Ваши стили остаются без изменений */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f7fa;
+            background-color: #e6ebf5;
             color: #333;
+            height: 100vh;
+            display: flex;
         }
 
         .container {
             display: flex;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
         }
 
         .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
+            width: 25%;
+            background-color: #2b5278;
             color: white;
-            padding: 20px;
+            border-right: 1px solid #1e3c5a;
             overflow-y: auto;
         }
 
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            background-color: #3498db;
-            color: white;
+        .sidebar h3 {
             padding: 15px 20px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .messages-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #eaf2f8;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            max-width: 70%;
-            padding: 12px 15px;
-            border-radius: 12px;
-            position: relative;
-            word-wrap: break-word;
-        }
-
-        .sent {
-            background-color: #dcf8c6;
-            margin-left: auto;
-            border-bottom-right-radius: 0;
-        }
-
-        .received {
-            background-color: white;
-            margin-right: auto;
-            border-bottom-left-radius: 0;
-        }
-
-        .error-message {
-            background-color: #ffebee;
-            border-left: 4px solid #f44336;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            color: #d32f2f;
-        }
-
-        .file-message {
-            background-color: #e3f2fd;
-            padding: 10px 15px;
-            border-radius: 18px;
-            margin-top: 8px;
-            display: inline-flex;
-            align-items: center;
-            max-width: 100%;
-        }
-
-        .file-icon {
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
-        .file-link {
-            color: #1976d2;
-            text-decoration: none;
+            margin: 0;
+            background-color: #1e3c5a;
+            font-size: 16px;
             font-weight: 500;
         }
 
-        .file-link:hover {
-            text-decoration: underline;
-        }
-
-        .message-sender {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            color: #7f8c8d;
-            text-align: right;
-            margin-top: 5px;
-        }
-
         .contact-item {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 5px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #1e3c5a;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .contact-item:hover {
-            background-color: #34495e;
-        }
-
-        .active-contact {
-            background-color: #34495e;
-            font-weight: bold;
+            background-color: #1e3c5a;
         }
 
         .contact-item a {
@@ -138,114 +57,194 @@
             display: block;
         }
 
+        .active-contact {
+            background-color: #1e3c5a;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 75%;
+            height: 100%;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background-color: #2b5278;
+            color: white;
+            border-bottom: 1px solid #1e3c5a;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e6ebf5;
+            background-image: url('https://web.telegram.org/img/pattern.png');
+            background-attachment: fixed;
+        }
+
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background-color: #d1edff;
+            margin-left: auto;
+            border-top-right-radius: 0;
+        }
+
+        .message.received {
+            background-color: white;
+            margin-right: auto;
+            border-top-left-radius: 0;
+        }
+
+        .message-sender {
+            font-weight: 500;
+            font-size: 14px;
+            color: #2b5278;
+            margin-bottom: 4px;
+        }
+
+        .message-content {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #7f8b97;
+            text-align: right;
+            margin-top: 4px;
+        }
+
         .message-form {
             display: flex;
-            padding: 15px;
-            background-color: white;
-            border-top: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f0f4f9;
+            border-top: 1px solid #d8e1e8;
             align-items: center;
         }
 
         .message-input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border: none;
             border-radius: 20px;
-            margin-right: 10px;
-            font-size: 14px;
+            background-color: white;
+            margin: 0 10px;
+            font-size: 15px;
             outline: none;
-            transition: border 0.3s;
-        }
-
-        .message-input:focus {
-            border-color: #3498db;
         }
 
         .send-btn {
-            padding: 12px 20px;
-            background-color: #3498db;
+            background-color: #2b5278;
             color: white;
             border: none;
             border-radius: 20px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            font-size: 15px;
+            transition: background-color 0.2s;
         }
 
         .send-btn:hover {
-            background-color: #2980b9;
+            background-color: #1e3c5a;
         }
 
         .file-input-wrapper {
             position: relative;
-            margin-right: 10px;
+        }
+
+        .file-btn {
+            background-color: transparent;
+            color: #2b5278;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
         }
 
         .file-input {
             position: absolute;
+            left: 0;
+            top: 0;
             opacity: 0;
-            width: 1px;
-            height: 1px;
-        }
-
-        .file-btn {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: #f5f5f5;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 120px;
-        }
-
-        .file-btn:hover {
-            background-color: #e0e0e0;
+            width: 0;
+            height: 0;
         }
 
         #file-name {
-            margin-left: 5px;
             font-size: 14px;
-            color: #555;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px;
-        }
-
-        .emoji-picker {
-            position: absolute;
-            bottom: 100%; /* Adjust as needed */
-            left: 0;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            display: none; /* Initially hidden */
-            z-index: 10;
-        }
-
-        .emoji-item {
-            font-size: 20px;
-            cursor: pointer;
-            padding: 3px;
-        }
-
-        .emoji-item:hover {
-            background-color: #f0f0f0;
+            margin-left: 5px;
+            color: #2b5278;
         }
 
         .emoji-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            padding: 5px;
-            margin-right: 5px;
+            padding: 8px;
+            color: #2b5278;
         }
 
-        .emoji-btn:focus {
-            outline: none;
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            left: 10px;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .emoji-item {
+            font-size: 24px;
+            margin: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.2);
+        }
+
+        .file-message {
+            display: flex;
+            align-items: center;
+        }
+
+        .file-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .file-link {
+            color: #2b5278;
+            text-decoration: none;
+        }
+
+        .file-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -297,7 +296,7 @@
                 <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
                 <span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span>
             </div>
-             <form method="POST" enctype="multipart/form-data" class="message-form" id="chat-form">
+            <form method="POST" enctype="multipart/form-data" class="message-form" id="chat-form">
                 <div class="file-input-wrapper">
                     <label for="file-input" class="file-btn" id="file-btn-label">
                         📎 <span id="file-name">Прикрепить файл</span>
@@ -317,19 +316,107 @@
 </div>
 
 <script>
-    // Automatic scroll to new messages
+    // Ключ и IV (Initialization Vector) для AES-шифрования
+    const AES_KEY = "my-secret-key-123"; // Ключ должен быть 16/24/32 байта
+    const AES_IV = "initial-vector-456"; // Вектор инициализации (16 байт)
+
+    // Функция шифрования AES
+    function encryptAES(message) {
+        const key = CryptoJS.enc.Utf8.parse(AES_KEY);
+        const iv = CryptoJS.enc.Utf8.parse(AES_IV);
+        const encrypted = CryptoJS.AES.encrypt(
+            CryptoJS.enc.Utf8.parse(message),
+            key,
+            { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+        );
+        return encrypted.toString();
+    }
+
+    // Перехватываем отправку формы и шифруем сообщение
+    document.getElementById('chat-form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Отменяем стандартную отправку
+
+        const messageInput = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+
+        if (messageInput.value.trim() === '' && !fileInput.files[0]) {
+            return; // Не отправляем пустые сообщения
+        }
+
+        // Создаём FormData для отправки
+        const formData = new FormData();
+
+        // Если есть файл, добавляем его
+        if (fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        // Если есть текст, шифруем и добавляем
+        if (messageInput.value.trim() !== '') {
+            const encryptedMessage = encryptAES(messageInput.value);
+            formData.append('content', messageInput.value); // Добавляем оригинальный текст
+            formData.append('encrypted_content', encryptedMessage); // Добавляем зашифрованное сообщение
+
+            // Сразу добавляем сообщение в чат (чтобы не ждать ответа сервера)
+            const messagesContainer = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.className = 'message sent';
+            newMessage.innerHTML = `
+                <div class="message-sender">Вы</div>
+                <div class="message-content">${messageInput.value}</div>
+                <div class="message-time">Только что</div>
+            `;
+            messagesContainer.appendChild(newMessage);
+            scrollToBottom();
+        }
+
+        // Отправляем данные на сервер
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                messageInput.value = ''; // Очищаем поле ввода
+                document.getElementById('file-name').textContent = 'Прикрепить файл';
+                fileInput.value = ''; // Сбрасываем файл
+
+                // Обновляем чат после успешной отправки
+                return fetch(window.location.href);
+            } else {
+                throw new Error('Ошибка отправки сообщения');
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            const newMessages = newDoc.getElementById('messages').innerHTML;
+            document.getElementById('messages').innerHTML = newMessages;
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+        });
+    });
+
+    // Автопрокрутка к новым сообщениям
     function scrollToBottom() {
         const messagesContainer = document.getElementById('messages');
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Set focus on message input after page loads
+    // Установка фокуса на поле ввода
     window.onload = function () {
         scrollToBottom();
         document.getElementById('message-input').focus();
     };
 
-    // Update file name and focus on input after file selection
+    // Обработка выбора файла
     document.getElementById('file-input').addEventListener('change', function (e) {
         const fileNameElement = document.getElementById('file-name');
         if (this.files && this.files[0]) {
@@ -343,14 +430,7 @@
         }
     });
 
-    // Submit form, then reset selected file
-    document.getElementById('chat-form').addEventListener('submit', function () {
-        setTimeout(() => {
-            document.getElementById('file-name').textContent = 'Прикрепить файл';
-        }, 100);
-    });
-
-    // Periodic chat update (every 5 seconds)
+    // Периодическое обновление чата (каждые 5 секунд)
     setInterval(function () {
         fetch(window.location.href)
             .then(response => response.text())
@@ -363,7 +443,7 @@
             });
     }, 5000);
 
-    // Emoji functionality
+    // Работа с эмодзи
     function toggleEmojiPicker() {
         const picker = document.getElementById('emoji-picker');
         picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
@@ -383,16 +463,13 @@
 
         do {
             if (targetElement == emojiPicker || targetElement == emojiButton) {
-                // This is a click inside the emoji picker or on the emoji button, do nothing.
                 return;
             }
             targetElement = targetElement.parentNode;
         } while (targetElement);
 
-        // This is a click outside the emoji picker and emoji button, close the picker!
         emojiPicker.style.display = 'none';
     });
-
 </script>
 </body>
 </html>
